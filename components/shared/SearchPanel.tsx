@@ -1,104 +1,57 @@
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+"use client";
+
+import { useDebouncedCallback } from "use-debounce";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "../ui/label";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Input } from "../ui/input";
-import { debounce } from "@/lib/utils";
-
-const formSchema = z.object({
-  name: z.string(),
-  personId: z.string(),
-});
+} from "../ui/select";
 
 export const SearchPanel = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      personId: "",
-    },
-  });
+  const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const { replace } = useRouter();
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-  };
-
-  const onInputChangeHandler = (
-    value: string,
-    onChangeField: (value: string) => void
-  ) => {
-    console.log(value);
-
-    return onChangeField(value);
-  };
-
-  const onSelectFieldHandler = (
-    value: string,
-    onChangeField: (value: string) => void
-  ) => {
-    console.log(value);
-
-    return onChangeField(value);
-  };
+  const handleSearch = useDebouncedCallback((term: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    term ? params.set("query", term) : params.delete("query");
+    replace(`${pathName}?${params.toString()}`);
+  }, 300);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input
-                  placeholder="项目名"
-                  {...field}
-                  onChange={(e) =>
-                    onInputChangeHandler(e.target.value, field.onChange)
-                  }
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="personId"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Select
-                  onValueChange={(value) =>
-                    onSelectFieldHandler(value, field.onChange)
-                  }
-                  value={field.value}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="负责人" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value={"1"}>张三</SelectItem>
-                      <SelectItem value={"2"}>李四</SelectItem>
-                      <SelectItem value={"3"}>王五</SelectItem>
-                      <SelectItem value={"4"}>马六</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+    <div className="relative flex-shrink-0 flex gap-2">
+      <Label htmlFor="search" className="sr-only">
+        Search
+      </Label>
+      <Input
+        className="w-[180px]"
+        placeholder={"项目名"}
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+        defaultValue={searchParams.get("query")?.toString()}
+      />
+
+      <Select>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="负责人" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="1">zhangsan</SelectItem>
+            <SelectItem value="2">lisi</SelectItem>
+            <SelectItem value="3">wangwu</SelectItem>
+            <SelectItem value="4">maliu</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   );
 };

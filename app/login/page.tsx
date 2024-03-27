@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
@@ -29,11 +27,8 @@ export default function Page() {
             alt="logo"
             width={80}
             height={80}
-            className="py-5 m-auto"
+            className="py-10 m-auto"
           />
-          {/* <div className="shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-md w-[400px] min-h-[560px] py-3 px-4 text-center">
-            <div className="mb-2.5 col-[rgb(94, 108, 132)]">请登陆</div>
-          </div> */}
           <Tabs defaultValue="login" className="w-[400px]">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">登陆</TabsTrigger>
